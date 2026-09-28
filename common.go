@@ -8,9 +8,17 @@ import (
 )
 
 func exitOnErr(details string, err error) {
-	if err != nil {
-		log.Fatalf("%s : %v", details, err)
+	if isErr(details, err) {
+		log.Fatal("")
 	}
+}
+
+func isErr(details string, err error) bool {
+	if err != nil {
+		log.Println("%s : %v", details, err)
+		return true
+	}
+	return false
 }
 
 func closeConn(c pop3.Conn) {

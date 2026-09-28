@@ -3,6 +3,7 @@ module go-archiver
 go 1.27.1
 
 require (
+	github.com/DusanKasan/parsemail v1.2.0
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/knadh/go-pop3 v1.0.2
 )
