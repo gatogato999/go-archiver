@@ -1,0 +1,8 @@
+POP_DOMAIN=mail.example
+POP_USER=test@example
+POP_PASS=example
+CDA_USER=example
+CDA_PASS=example
+CDA_DOMAIN=golang
+CDA_ENDPOINT=http://localhost:10032/cda/UploadAttachment
+MAX_ATTEMPTS=3
