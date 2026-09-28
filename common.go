@@ -4,7 +4,6 @@ import (
 	"log"
 
 	"github.com/ilyakaznacheev/cleanenv"
-	"github.com/knadh/go-pop3"
 )
 
 func exitOnErr(details string, err error) {
@@ -21,12 +20,6 @@ func isErr(details string, err error) bool {
 	return false
 }
 
-func closeConn(c pop3.Conn) {
-	err := c.Quit()
-	exitOnErr("client quit failed, delation may have failed", err)
-	log.Println("quitting")
-}
-
 type config struct {
 	PopHost     string `env:"POP_DOMAIN"   env-required:"true"`
 	PopUser     string `env:"POP_USER"     env-required:"true"`
@@ -35,11 +28,11 @@ type config struct {
 	CdaPass     string `env:"CDA_PASS"     env-required:"true"`
 	CdaDomain   string `env:"CDA_DOMAIN"                       env-default:"golang"`
 	CdaEndpoint string `env:"CDA_ENDPOINT"                     env-default:"http://localhost:10032/cda/UploadAttachment"`
+	MaxAttempts int    `env:"MAX_ATTEMPTS"                     env-default:"5"`
 }
 
 func loadConfig() config {
 	var cfg config
-	err := cleanenv.ReadConfig(".env", &cfg)
-	exitOnErr("failed to read .evn", err)
+	exitOnErr("failed to read .evn", cleanenv.ReadConfig(".env", &cfg))
 	return cfg
 }
