@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"io"
+	"log"
 
 	"github.com/DusanKasan/parsemail"
 	"github.com/knadh/go-pop3"
@@ -35,14 +36,13 @@ func processMessages(
 		from := email.From[0].Address
 		var allAttachsNames []string
 		for _, attach := range email.Attachments {
-			fmt.Printf("attach %s ", attach.Filename)
 			if attach.Filename == "" {
 				continue
 			}
 			allAttachsNames = append(allAttachsNames, attach.Filename)
 			key := Key{UIDL: m.UID, Attachment: attach.Filename}
 			if !store.Uploadable(key) {
-				fmt.Printf("skip %s : not Uploadable", attach.Filename)
+				log.Printf("skip %s : not Uploadable \n", attach.Filename)
 				continue
 			}
 			data, err := io.ReadAll(attach.Data)
@@ -56,19 +56,19 @@ func processMessages(
 				Contents: content, Filename: attach.Filename,
 				Domain: cfg.CdaDomain,
 			})
-			fmt.Printf("uploader response %s -> %+v", attach.Filename, res)
+			log.Printf("uploader response %s -> %+v \n", attach.Filename, res)
 			_ = isErr("saving record failed", store.Record(key, res))
 		}
 		switch {
 		case len(allAttachsNames) == 0:
-			fmt.Printf("\n skip: %s, has no attachments \n", m.UID)
+			log.Printf("skip: %s, has no attachments \n", m.UID)
 		case store.Resolved(m.UID, allAttachsNames):
-			fmt.Printf("\n %s, is resolved \n", m.UID)
+			log.Printf("%s, is resolved \n", m.UID)
 			if !isErr(fmt.Sprintf("deletion failed, uidl=%s", m.UID), client.Dele(m.ID)) {
-				fmt.Printf("\n %s, marked for delete \n", m.UID)
+				log.Printf("%s, marked for delete \n", m.UID)
 			}
 		default:
-			fmt.Printf("\n %s, is not resolved, from: %s \n", m.UID, from)
+			log.Printf("%s, is not resolved, from: %s \n", m.UID, from)
 		}
 	}
 }

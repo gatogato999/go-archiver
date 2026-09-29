@@ -56,7 +56,7 @@ func (u *Uploader) Upload(req UploadReq) AttachStatus {
 	if isErr("Upload: deserialization failed", err) {
 		return FailedRetryable
 	}
-	log.Printf("uploader http response %+v", r)
+	log.Printf("uploader http response %+v \n", r)
 	switch {
 	case r.Message == "Empty data" || r.Message == "Empty attachment" || r.Message == "Ignoring small attachments":
 		return SkippedTooSmall

@@ -40,3 +40,4 @@ go.sum
 *.zip
 go-archiver
 *data*
+logs/

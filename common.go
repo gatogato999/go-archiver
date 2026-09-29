@@ -1,19 +1,22 @@
 package main
 
 import (
+	"io"
 	"log"
+	"os"
+	"time"
 
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/knadh/go-pop3"
 )
 
 func exitOnErr(details string, err error) {
-	if isErr(details, err) { log.Fatal("") }
+	if isErr(details, err) { log.Fatal("stoping execution") }
 }
 
 func isErr(details string, err error) bool {
 	if err != nil {
-		log.Printf("%s : %v", details, err)
+		log.Printf("%s : %v \n", details, err)
 		return true
 	}
 	return false
@@ -35,10 +38,17 @@ func loadConfig() (cfg config) {
 	return cfg
 }
 
-func connectClient(cfg config) (client *pop3.Conn, err error) {
-	client, err = pop3.New(pop3.Opt{ Host: cfg.PopHost, Port: 995, TLSEnabled: true, }).NewConn()
-	if isErr("client creation failed", err) { return nil, err }
-	err = client.Auth(cfg.PopUser, cfg.PopPass)
-	if isErr("client auth failed", err) { return nil, err }
-	return client, nil
+func connectClient(cfg config) (client *pop3.Conn ) {
+	client, err := pop3.New(pop3.Opt{ Host: cfg.PopHost, Port: 995, TLSEnabled: true, }).NewConn()
+	exitOnErr("client creation failed", err)
+	exitOnErr("client auth failed", client.Auth(cfg.PopUser, cfg.PopPass))
+	return client 
+}
+
+func initLog()  *os.File {
+os.MkdirAll("logs", 0755)
+f, err := os.OpenFile( "logs/"+time.Now().Format("02-01-2006")+".log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644,)
+exitOnErr("can't open/create log folder/file", err)
+log.SetOutput(io.MultiWriter(os.Stdout, f))
+return f
 }
