@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"log"
 	"net/http"
 	"time"
 )
@@ -55,6 +56,7 @@ func (u *Uploader) Upload(req UploadReq) AttachStatus {
 	if isErr("Upload: deserialization failed", err) {
 		return FailedRetryable
 	}
+	log.Printf("uploader http response %+v", r)
 	switch {
 	case r.Message == "Empty data" || r.Message == "Empty attachment" || r.Message == "Ignoring small attachments":
 		return SkippedTooSmall

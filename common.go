@@ -4,12 +4,11 @@ import (
 	"log"
 
 	"github.com/ilyakaznacheev/cleanenv"
+	"github.com/knadh/go-pop3"
 )
 
 func exitOnErr(details string, err error) {
-	if isErr(details, err) {
-		log.Fatal("")
-	}
+	if isErr(details, err) { log.Fatal("") }
 }
 
 func isErr(details string, err error) bool {
@@ -31,8 +30,15 @@ type config struct {
 	MaxAttempts int    `env:"MAX_ATTEMPTS"                     env-default:"5"`
 }
 
-func loadConfig() config {
-	var cfg config
+func loadConfig() (cfg config) {
 	exitOnErr("failed to read .evn", cleanenv.ReadConfig(".env", &cfg))
 	return cfg
+}
+
+func connectClient(cfg config) (client *pop3.Conn, err error) {
+	client, err = pop3.New(pop3.Opt{ Host: cfg.PopHost, Port: 995, TLSEnabled: true, }).NewConn()
+	if isErr("client creation failed", err) { return nil, err }
+	err = client.Auth(cfg.PopUser, cfg.PopPass)
+	if isErr("client auth failed", err) { return nil, err }
+	return client, nil
 }

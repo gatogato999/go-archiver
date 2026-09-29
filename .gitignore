@@ -35,3 +35,8 @@ go.sum
 *_test.go
 *.json*
 *tmp
+
+*.gz
+*.zip
+go-archiver
+*data*
